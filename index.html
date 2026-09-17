@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -106,7 +107,7 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 4px var(--focus-ring);
         }
-        
+
         .form-group input::placeholder {
             color: #9ca3af;
         }
@@ -137,6 +138,7 @@
         .link-external {
             color: var(--text-muted);
         }
+
         .link-external:hover {
             color: var(--text-main);
         }
@@ -144,6 +146,7 @@
         .link-primary {
             color: var(--primary-color);
         }
+
         .link-primary:hover {
             color: var(--primary-hover);
         }
@@ -178,7 +181,7 @@
         .btn-primary:hover {
             background-color: var(--primary-hover);
         }
-        
+
         .btn-primary:active {
             transform: translateY(1px);
         }
@@ -211,7 +214,7 @@
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
         }
-        
+
         .results-header h3 {
             font-size: 1.25rem;
             font-weight: 600;
@@ -300,7 +303,7 @@
         /* Loading overlay */
         .loader {
             display: none;
-            border: 2px solid rgba(0,0,0,0.1);
+            border: 2px solid rgba(0, 0, 0, 0.1);
             border-top: 2px solid currentColor;
             border-radius: 50%;
             width: 18px;
@@ -309,12 +312,17 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+            0% {
+                transform: rotate(0deg);
+            }
 
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -326,20 +334,22 @@
         <div class="card">
             <div class="form-group">
                 <label for="baseUrl">Base URL Template</label>
-                <input type="text" id="baseUrl" value="https://google.rate-us.workers.dev?id={RANDOM_CODE}" placeholder="https://example.com?id={RANDOM_CODE}">
-                <small style="color: var(--text-muted); display: block; margin-top: 6px;">Use {RANDOM_CODE} where the 6-digit code should be inserted.</small>
+                <input type="text" id="baseUrl" value="https://google.rate-us.workers.dev?id={RANDOM_CODE}"
+                    placeholder="https://example.com?id={RANDOM_CODE}">
+                <small style="color: var(--text-muted); display: block; margin-top: 6px;">Use {RANDOM_CODE} where the
+                    6-digit code should be inserted.</small>
             </div>
             <div class="form-group">
                 <label for="codeCount">Number of QR Codes</label>
                 <input type="number" id="codeCount" value="10" min="1" max="1000">
             </div>
-            
-            <div class="links-row">
+
+            <!-- <div class="links-row">
                 <a href="https://qr-design-automator.vercel.app/" target="_blank" rel="noopener noreferrer" class="link-external">
                     <i class="ri-external-link-line"></i> Open QR Design Automator
                 </a>
                 <a href="assign.html" class="link-primary"><i class="ri-links-line"></i> Go to Value Assignment Page &rarr;</a>
-            </div>
+            </div> -->
 
             <div class="actions">
                 <button class="btn-primary" id="generateBtn" onclick="generateQRCodes()">
@@ -401,7 +411,7 @@
                     }
                 }
             }
-            
+
             svg += `</svg></g></svg>`;
             return svg;
         }
@@ -410,7 +420,7 @@
             const baseUrl = document.getElementById('baseUrl').value;
             const count = parseInt(document.getElementById('codeCount').value) || 10;
             const grid = document.getElementById('resultsGrid');
-            
+
             grid.innerHTML = '';
             generatedData = [];
 
@@ -418,7 +428,7 @@
                 const code = generateRandomCode();
                 const finalUrl = baseUrl.replace('{RANDOM_CODE}', code);
                 const svgString = createExactSVG(finalUrl);
-                
+
                 generatedData.push({
                     code: code,
                     url: finalUrl,
@@ -454,7 +464,7 @@
 
             try {
                 const zip = new JSZip();
-                
+
                 generatedData.forEach(data => {
                     zip.file(`${data.code}.svg`, data.svg);
                 });
@@ -472,4 +482,5 @@
 
     </script>
 </body>
+
 </html>
