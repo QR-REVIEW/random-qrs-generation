@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Bulk Generator</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --surface-color: #ffffff;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-radius: 12px;
+            --input-bg: #ffffff;
+            --focus-ring: rgba(37, 99, 235, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 32px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-main);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+        
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .links-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding: 16px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .links-row a {
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .link-external {
+            color: var(--text-muted);
+        }
+        .link-external:hover {
+            color: var(--text-main);
+        }
+
+        .link-primary {
+            color: var(--primary-color);
+        }
+        .link-primary:hover {
+            color: var(--primary-hover);
+        }
+
+        .actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            flex: 1;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-main);
+            border-color: var(--border-color);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            box-shadow: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .results-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .qr-item {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .qr-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #bfdbfe;
+        }
+
+        .qr-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .qr-preview svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .qr-code-text {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+            word-break: break-all;
+            text-align: center;
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .qr-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+            background-color: var(--surface-color);
+            border: 2px dashed #d1d5db;
+            border-radius: var(--card-radius);
+            margin-top: 32px;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: #9ca3af;
+            display: block;
+        }
+
+        /* Loading overlay */
+        .loader {
+            display: none;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>QR Bulk Generator</h1>
+            <p class="subtitle">Generate random codes and export exact SVGs</p>
+        </header>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="baseUrl">Base URL Template</label>
+                <input type="text" id="baseUrl" value="https://google.rate-us.workers.dev?id={RANDOM_CODE}" placeholder="https://example.com?id={RANDOM_CODE}">
+                <small style="color: var(--text-muted); display: block; margin-top: 6px;">Use {RANDOM_CODE} where the 6-digit code should be inserted.</small>
+            </div>
+            <div class="form-group">
+                <label for="codeCount">Number of QR Codes</label>
+                <input type="number" id="codeCount" value="10" min="1" max="1000">
+            </div>
+            
+            <div class="links-row">
+                <a href="https://qr-design-automator.vercel.app/" target="_blank" rel="noopener noreferrer" class="link-external">
+                    <i class="ri-external-link-line"></i> Open QR Design Automator
+                </a>
+                <a href="assign.html" class="link-primary"><i class="ri-links-line"></i> Go to Value Assignment Page &rarr;</a>
+            </div>
+
+            <div class="actions">
+                <button class="btn-primary" id="generateBtn" onclick="generateQRCodes()">
+                    <i class="ri-qr-code-line"></i> Generate
+                </button>
+                <button class="btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>
+                    <i class="ri-download-2-line"></i> Download All (ZIP)
+                </button>
+            </div>
+        </div>
+
+        <div class="card" id="resultsCard" style="display: none;">
+            <div class="results-header">
+                <h3>Generated QR Codes</h3>
+                <span id="resultCount" style="color: var(--text-muted); font-size: 0.9rem;"></span>
+            </div>
+            <div class="results-grid" id="resultsGrid">
+                <!-- QR codes will be injected here -->
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <i class="ri-qr-code-line"></i>
+            <p>Click Generate to create QR codes</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        let generatedData = [];
+
+        function generateRandomCode() {
+            return crypto.randomUUID();
+        }
+
+        function createExactSVG(url) {
+            // Force type number to get consistent size, usually type 4 works well for these URLs.
+            // If the URL is very long, we might need a higher type number. Let qrcode decide.
+            var qr = qrcode(0, 'L');
+            qr.addData(url);
+            qr.make();
+
+            const moduleCount = qr.getModuleCount();
+            const blockSize = 20;
+            const margin = 4; // 4 blocks of margin on each side (80px)
+            const size = (moduleCount + 2 * margin) * blockSize;
+
+            let svg = `<?xml version="1.0" encoding="utf-8"?>\n<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve"><g transform="translate(0,0) scale(1.0,1.0)"><svg width="1000" height="1000" viewBox="0 0 ${size} ${size}" enable-background="new 0 0 1000 1000" xml:space="preserve"><rect x="0" y="0" width="${size}" height="${size}" fill="rgb(255,255,255)" opacity="0.0" />`;
+
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        const x = (col + margin) * blockSize;
+                        const y = (row + margin) * blockSize;
+                        svg += `<rect x="${x}" y="${y}" width="${blockSize}" height="${blockSize}" fill="rgb(0,0,0)" opacity="1.0" shape-rendering="crispEdges" />`;
+                    }
+                }
+            }
+            
+            svg += `</svg></g></svg>`;
+            return svg;
+        }
+
+        function generateQRCodes() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const count = parseInt(document.getElementById('codeCount').value) || 10;
+            const grid = document.getElementById('resultsGrid');
+            
+            grid.innerHTML = '';
+            generatedData = [];
+
+            for (let i = 0; i < count; i++) {
+                const code = generateRandomCode();
+                const finalUrl = baseUrl.replace('{RANDOM_CODE}', code);
+                const svgString = createExactSVG(finalUrl);
+                
+                generatedData.push({
+                    code: code,
+                    url: finalUrl,
+                    svg: svgString
+                });
+
+                // Create UI element
+                const item = document.createElement('div');
+                item.className = 'qr-item';
+                item.innerHTML = `
+                    <div class="qr-preview">
+                        ${svgString}
+                    </div>
+                    <div class="qr-code-text">${code}</div>
+                    <div class="qr-url" title="${finalUrl}">${finalUrl.length > 25 ? finalUrl.substring(0, 25) + '...' : finalUrl}</div>
+                `;
+                grid.appendChild(item);
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsCard').style.display = 'block';
+            document.getElementById('resultCount').textContent = `${count} codes generated`;
+            document.getElementById('downloadBtn').disabled = false;
+        }
+
+        async function downloadAll() {
+            if (generatedData.length === 0) return;
+
+            const btn = document.getElementById('downloadBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader" style="display:inline-block; width: 16px; height: 16px; border-width: 2px;"></div> Packaging...';
+            btn.disabled = true;
+
+            try {
+                const zip = new JSZip();
+                
+                generatedData.forEach(data => {
+                    zip.file(`${data.code}.svg`, data.svg);
+                });
+
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, "qrcodes.zip");
+            } catch (error) {
+                console.error("Error creating ZIP", error);
+                alert("Failed to create ZIP file.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+    </script>
+</body>
+</html>
