@@ -15,6 +15,7 @@
             --surface-color: #ffffff;
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
+            --success-color: #10b981;
             --text-main: #111827;
             --text-muted: #6b7280;
             --border-color: #e5e7eb;
@@ -112,49 +113,11 @@
             color: #9ca3af;
         }
 
-        .links-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 32px;
-            padding: 16px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .links-row a {
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s ease;
-        }
-
-        .link-external {
-            color: var(--text-muted);
-        }
-
-        .link-external:hover {
-            color: var(--text-main);
-        }
-
-        .link-primary {
-            color: var(--primary-color);
-        }
-
-        .link-primary:hover {
-            color: var(--primary-hover);
-        }
-
         .actions {
             display: flex;
             gap: 16px;
             margin-top: 32px;
+            flex-wrap: wrap;
         }
 
         button {
@@ -169,12 +132,13 @@
             justify-content: center;
             gap: 8px;
             transition: all 0.2s ease;
+            flex: 1;
+            min-width: 200px;
         }
 
         .btn-primary {
             background-color: var(--primary-color);
             color: white;
-            flex: 1;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
@@ -204,6 +168,12 @@
             background-color: #f3f4f6;
             color: #9ca3af;
             box-shadow: none;
+        }
+        
+        .btn-success {
+            color: var(--success-color);
+            border-color: var(--success-color);
+            background-color: #f0fdf4;
         }
 
         .results-header {
@@ -312,13 +282,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -344,19 +309,15 @@
                 <input type="number" id="codeCount" value="10" min="1" max="1000">
             </div>
 
-            <!-- <div class="links-row">
-                <a href="https://qr-design-automator.vercel.app/" target="_blank" rel="noopener noreferrer" class="link-external">
-                    <i class="ri-external-link-line"></i> Open QR Design Automator
-                </a>
-                <a href="assign.html" class="link-primary"><i class="ri-links-line"></i> Go to Value Assignment Page &rarr;</a>
-            </div> -->
-
             <div class="actions">
                 <button class="btn-primary" id="generateBtn" onclick="generateQRCodes()">
                     <i class="ri-qr-code-line"></i> Generate
                 </button>
+                <button class="btn-secondary" id="copyBtn" onclick="copyLinks()" disabled>
+                    <i class="ri-file-copy-line"></i> Copy Links (Excel)
+                </button>
                 <button class="btn-secondary" id="downloadBtn" onclick="downloadAll()" disabled>
-                    <i class="ri-download-2-line"></i> Download All (ZIP)
+                    <i class="ri-download-2-line"></i> Download ZIP
                 </button>
             </div>
         </div>
@@ -389,8 +350,6 @@
         }
 
         function createExactSVG(url) {
-            // Force type number to get consistent size, usually type 4 works well for these URLs.
-            // If the URL is very long, we might need a higher type number. Let qrcode decide.
             var qr = qrcode(0, 'L');
             qr.addData(url);
             qr.make();
@@ -442,7 +401,7 @@
                     <div class="qr-preview">
                         ${svgString}
                     </div>
-                    <div class="qr-code-text">${code}</div>
+                    <div class="qr-code-text" title="Code ID">${code.substring(0, 8)}...</div>
                     <div class="qr-url" title="${finalUrl}">${finalUrl.length > 25 ? finalUrl.substring(0, 25) + '...' : finalUrl}</div>
                 `;
                 grid.appendChild(item);
@@ -451,7 +410,36 @@
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('resultsCard').style.display = 'block';
             document.getElementById('resultCount').textContent = `${count} codes generated`;
+            
+            // Enable the download and copy buttons
             document.getElementById('downloadBtn').disabled = false;
+            document.getElementById('copyBtn').disabled = false;
+        }
+
+        async function copyLinks() {
+            if (generatedData.length === 0) return;
+
+            // Join all URLs using a newline character. Excel interprets newlines as new rows.
+            const linksText = generatedData.map(data => data.url).join('\n');
+            const btn = document.getElementById('copyBtn');
+            const originalHTML = btn.innerHTML;
+
+            try {
+                await navigator.clipboard.writeText(linksText);
+                
+                // Show success feedback
+                btn.innerHTML = '<i class="ri-check-line"></i> Copied!';
+                btn.classList.add('btn-success');
+                
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('btn-success');
+                }, 2000);
+            } catch (err) {
+                console.error("Failed to copy links", err);
+                alert("Failed to copy links to clipboard. Ensure your browser permits clipboard access.");
+            }
         }
 
         async function downloadAll() {
@@ -479,7 +467,6 @@
                 btn.disabled = false;
             }
         }
-
     </script>
 </body>
 
